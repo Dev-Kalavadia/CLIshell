@@ -83,10 +83,11 @@ df: Command to display the display the available disk space
 whoami: Command to print the name of the current user
 
 Pipe Commands: Used to combine two or more commands. The output of one command is the input of the next command.  
+```
 ls | wc
 ls -l | grep d | wc -c
 cat xyz.txt | grep r | tee abc.txt | wc -l
-
+```
 ### File Contents:
 
 client.c : Contains the main function for running the client side application. 
@@ -103,7 +104,7 @@ singlecommand.c : Runs execution of the commands which do not use pipes.
 
 Pipe Checking:
  Pipe checking is done by the file checkpipe.c which checks if an entered string has pipes. If pipes are present, each section of the pipe is parsed and tokenized separately and sent to the appropriate pipe execution function (single pipe, double pipe, etc…). 
-
+```
 int checkPipe(char* str1){
  int count = 0;
    // int pipeFlag = 0;
@@ -114,13 +115,15 @@ int checkPipe(char* str1){
    }
  return count;
 }
+```
 
 
 ### Parsing and Tokenizing: 
 We handle parsing and tokenizing of commands in the splitter.c file. Both lineSplitter() and pipeSplitter() functions work in a similar manner. Token sizes are dynamically allocated and the tokens are separated using predefined delimiters for each function. The tokens are returned as an array which is further used by other functions. 
 
-
+```
 char **pipeSplitter(char *line, int pipeflag){
+
   int bufferSize = BUFFER_SIZE, indexPosition = 0;
   char **tokens = malloc(bufferSize * sizeof(char*)); // Array of tokens dynamically allocated
   char *token; // Each token (string between pipes)
@@ -147,19 +150,20 @@ char **pipeSplitter(char *line, int pipeflag){
   tokens[indexPosition] = NULL;
   return tokens; // return the array of tokens (arguments pipe separated )
 }
+```
 
 
 
 ### Piped Commands Execution:
 Commands which pipes are directed to the functions in the pipes.c file. The pipes make use of the concept of process communication to execute multiple commands using multiple child processes. The number of commands determines the number of pipes used. For instance, a single pipe command requires two separate commands to be run, where the output of the first command becomes the input of the second command. This is done using two child processes (forks), which communicate using a file descriptor. The standard output of the first child is redirected to the second child using the dup2() function. The final output is then sent back to the output stream. Double and Triple pipe functions work similarly, except that the number of file descriptors, child processes, output redirections, etc… increase proportionately with the number of pipes. 
-
+```
 dup2(socket, STDOUT_FILENO); // reading redirected output of ls through pipe 1
 dup2(socket, STDERR_FILENO);
-
+```
 
 ### Sockets for Server to Client Communication:
 This function is the core of our program. It demonstrated communication between two nodes (here the Server and Client) over a network. Various functions like listen(), bind(), accept() and connect() are used to enable a successful connection between the server and client. Messages are sent back and forth between the two nodes using send() and recv(). 
-
+```
 int sock1, sock2, valread;
 struct sockaddr_in address; // structure for storing address
 int addrlen = sizeof(address); // Getting the size off the address
@@ -195,7 +199,7 @@ int addrlen = sizeof(address); // Getting the size off the address
        perror("accept");
        exit(EXIT_FAILURE);
      }
-
+```
 
 ### Client Disconnection and Reconnection
 The server waits for the client to connect and accepts commands as long as it is connected to the. When the client leaves using ‘exit’, the connection is disrupted and the server now goes back to waiting for a client to connect. This functions similar to how an actual server and client system would work. This feature is implemented by using a flag which checks which changes to true if the client sends exit. This makes the client exit and sends the server to waiting for a client. 
@@ -241,7 +245,7 @@ Finally start clients using $./client
 ### Functions and Functionalities:
 
 #### Multithreading for multiple Clients
- 
+ ```
  while (1) // to keep server alive forever
  {
    printf(">Waiting for Client to connect\n"); // Server is listening and waiting for connection
@@ -274,12 +278,12 @@ Finally start clients using $./client
     
    }
  }
-
+```
 
 
 
 #### Exiting Client using “exit” and ^C:
-
+```
 void clientExitHandler(int sig_num)
 {
  char *exitString = "exit";
@@ -297,7 +301,7 @@ int main() // main function
  printf("\t --------------------------------------------------------\n");
  signal(SIGINT, serverExitHandler);
 }
-
+```
 
 
 ### Challenges :-
@@ -334,8 +338,9 @@ Finally start clients using $./client
 
 ### Functions and Functionalities:
 
-Struct for each Process
-//Structure to hold each process detail
+#### Struct for each Process
+Structure to hold each process detail
+```
 struct process
 {
  int processTime; // Burst time
@@ -354,9 +359,10 @@ struct process
 };
 
 struct process queue[MAX_QUEUE_SIZE];
-
+```
 
 ### Shortest Job First
+```
 void sortQueue()
 {
  int index, i, j;
@@ -381,10 +387,12 @@ void sortQueue()
      }
    }
  }
+ ```
 
 
 ### Priority in the Queue
-// Sorting the queue by priority (by default it is 0 for all process)
+Sorting the queue by priority (by default it is 0 for all process)
+```
 void sortQueueByPriority()
 {
  int index, i, j;
@@ -401,13 +409,15 @@ void sortQueueByPriority()
    }
  }
 }
+```
 
 
 ### Adding to the queue 
 
 This function basically adds each command to the queue by taking in the common and socket as arguments and create a new structure for that process to be added to the queue. By default it has a priority of zero and the name and first time specified by the user which is parsed accordingly and assigned to the respective variables in the structure. Here is a commented code to see our implementation for this function.
 
-// Adding each process to the queue
+Adding each process to the queue
+```
 struct process addToQueue(char *command, int socket) // Command from client and the socket #
 {
  struct process newProgram; // Creating a new struct
@@ -450,13 +460,14 @@ struct process addToQueue(char *command, int socket) // Command from client and 
 
  return newProgram; // returning the new process
 }
-
+```
 
 
 
 ### Scheduler 
 The schedule function runs in a wild look because the schedule will always be running on its own core thread. Function will call our scheduling algorithm which is round robin.
 // Scheduler which is running on a separate thread is always running RR
+```
 void *Scheduler(void *arg)
 {
  while (1)
@@ -466,9 +477,6 @@ void *Scheduler(void *arg)
  return 0;
 }
 
-
-
-
  pthread_t corethread_id; // Core thead to run the scheduler
  int corethread = pthread_create(&corethread_id, NULL, Scheduler, arg);
  if (corethread) // if corethread is > 0 imply could not create new thread
@@ -477,29 +485,30 @@ void *Scheduler(void *arg)
    exit(EXIT_FAILURE);
  }
 
-
+```
 
 
 
 ### Real time clock for Arrival time.
 This functions allowed us to implement a real time stopwatch for arrival time which was used for each process as soon as it was received by the server and add it to the queue. We used a signal which with our alarm for one second and incremented a global seconds variable.
+```
 void handle(int sig)
 { // Handles the signal alarm
  seconds++;
  alarm(1); // Sends alarm signal after one second
 }
 
-
    // Code for keeping track of time and clock
    setbuf(stdout, NULL);
    signal(SIGALRM, handle); // Assigns a handler for the alarm signal (in order for the time to keep running)
    alarm(1);
-
+```
 
 ### Program Runing Simulation 
 Program runner function allowed us to simulate a program which would run in the OS. For this the user specifies the time and priority if needed which is updated in the structure. The running structure is paused into the function along with the quantum which is used in the follow-up to run for that specified quantum seconds which is simulated by using sleep for one second and decrementing the process time.
 
 Program runner also takes care of the case where the process is not finished it updates the time it has run for quantum and puts it back in the queue at the bottom thus preparing for a round robin to take place.
+```
 void programRunner(struct process *process, int quantum) // Process passes as pointer
 {
  runningState = 1; // its running
@@ -529,12 +538,13 @@ void programRunner(struct process *process, int quantum) // Process passes as po
  removefromQueue(process->processID);  // removing by process ID
  runningState = 0; // Setting running state to 0
 }
+```
 
 
 Similarly, we used command runner to implement the the command case where do use the word specify a Linux terminal command and that function was built upon all the code from our previous phases.
 
 ### Exiting Client using “exit” and ^C:
-
+```
 void clientExitHandler(int sig_num)
 {
  char *exitString = "exit";
@@ -552,7 +562,7 @@ int main() // main function
 
  signal(SIGINT, serverExitHandler);
 }
-
+```
 
 ## Algorithms Used
 
@@ -566,6 +576,7 @@ For the actual execution we are using destruct process flag which indicates if i
 In order to ensure that a process turns on a different quantum after finishing its initial around we are using a rounds counter variable inside the structure and incrementing it every single time it runs per quantum. This allows us to increment the quantum for that particular process every single time it runs each round.
 
 Importantly we are locking each critical section where a program or command is being ran with a lock Mutex (global) which is acquired and released wherever our critical section (function) is being called. 
+```
        pthread_mutex_lock(&lock); // acquiring the lock
        printf("Semaphore acquired programRunner\n");
        // fflush(stdout);
@@ -573,7 +584,7 @@ Importantly we are locking each critical section where a program or command is b
        programRunner(&queue[i], time_quantum+queue[i].roundsCounter);
        printf("Semaphore Released programRunner\n");
        pthread_mutex_unlock(&lock); // releasing the lock
-
+```
 
 
 Lastly we update the time elapsed variable by adding the respective time that he has run and updating the process completed time accordingly.
@@ -582,7 +593,8 @@ Lastly we update the time elapsed variable by adding the respective time that he
 
 
 
-## #RR Code
+## RR Code
+```
 void RR()
 {
  int time_elapsed = 0; // if time has passed to update completed time later
@@ -661,7 +673,7 @@ void RR()
    }
  }
 }
-
+```
 
 
 
