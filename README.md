@@ -5,9 +5,9 @@ Operating Systems
 Assignment - Phase 4: Remote Multitasking CLI Shell with Scheduling Capabilities 
 
 
-#Remote shell 
+# Remote shell 
 
-##Phase 1:-
+## Phase 1:-
 ###Description: 
 For this assignment, we programmed our own local shell / CLI using C. It stimulates the services of the operating system using system calls. We used features such as process creation, interprocess communication, etc. to execute the same. 15 commands that have been listed below can be run, including pipes (upto three pipes). 
 How to Compile: 
@@ -37,7 +37,7 @@ Pipe Commands: Used to combine two or more commands. The output of one command i
 3. cat xyz.txt | grep r | tee abc.txt | wc -l 
 Test Cases can be found under phase 2 below.
  
-##Challenges :- 
+### Challenges :- 
 Along the way, we faced a few challenges we were able to overcome. 
 1. The first challenge we faced was parsing the entered command(s). We overcame this by using strtok() which broke the string into a series of strings using our given delimiters. We were able to modify this in our pre-built functions to reuse them for extracting commands when pipes were used. 
 2. Figuring out the right nested forks for triple pipes proved to be a challenging task as well. We were able to overcome this by doing some research as well as using trial and error till we were able to have an error free case.
@@ -48,13 +48,13 @@ Along the way, we faced a few challenges we were able to overcome.
 
 
 
-##Phase 2:-
+## Phase 2:-
 
-#Description:
+### Description:
 
 For this assignment, we programmed our own Client-Server remote shell using socket communication in C. It stimulates the services of the Client server network using sockets, ports and local IP addresses to create a remote connection between the client and server. In this phase, we were taking the input from the user client and sending the request to the server. For each input from the client which could either be a comment from our listed menu or a pipe command with up to three pipes. Then the server will process the command and send the output or result back to the client which will be printed on the clients terminal screen
 
-How to Compile and Run:
+### How to Compile and Run:
 
 We have used makefile to organize the project’s code compilation. To run a makefile code, run the following commands in the terminal. 
 
@@ -64,7 +64,7 @@ Then run $make to compile the code
 Then, the server should be started first using $./server
 Finally start the client using $./client
 
-List of commands that the server:-
+### List of commands that the server:-
 
 ls: Command to display the files in a directory
 touch: Command to create a file 
@@ -87,7 +87,7 @@ ls | wc
 ls -l | grep d | wc -c
 cat xyz.txt | grep r | tee abc.txt | wc -l
 
-IV.	File Contents:
+### File Contents:
 
 client.c : Contains the main function for running the client side application. 
 server.c : Contains the main function for running the server side application.
@@ -99,7 +99,7 @@ singlecommand.c : Runs execution of the commands which do not use pipes.
 
 
 
- V. 	Functions and Functionalities:
+### Functions and Functionalities:
 
 Pipe Checking:
  Pipe checking is done by the file checkpipe.c which checks if an entered string has pipes. If pipes are present, each section of the pipe is parsed and tokenized separately and sent to the appropriate pipe execution function (single pipe, double pipe, etc…). 
@@ -116,7 +116,7 @@ int checkPipe(char* str1){
 }
 
 
-Parsing and Tokenizing: 
+### Parsing and Tokenizing: 
 We handle parsing and tokenizing of commands in the splitter.c file. Both lineSplitter() and pipeSplitter() functions work in a similar manner. Token sizes are dynamically allocated and the tokens are separated using predefined delimiters for each function. The tokens are returned as an array which is further used by other functions. 
 
 
@@ -150,14 +150,14 @@ char **pipeSplitter(char *line, int pipeflag){
 
 
 
-Piped Commands Execution:
+### Piped Commands Execution:
 Commands which pipes are directed to the functions in the pipes.c file. The pipes make use of the concept of process communication to execute multiple commands using multiple child processes. The number of commands determines the number of pipes used. For instance, a single pipe command requires two separate commands to be run, where the output of the first command becomes the input of the second command. This is done using two child processes (forks), which communicate using a file descriptor. The standard output of the first child is redirected to the second child using the dup2() function. The final output is then sent back to the output stream. Double and Triple pipe functions work similarly, except that the number of file descriptors, child processes, output redirections, etc… increase proportionately with the number of pipes. 
 
 dup2(socket, STDOUT_FILENO); // reading redirected output of ls through pipe 1
 dup2(socket, STDERR_FILENO);
 
 
-Sockets for Server to Client Communication:
+### Sockets for Server to Client Communication:
 This function is the core of our program. It demonstrated communication between two nodes (here the Server and Client) over a network. Various functions like listen(), bind(), accept() and connect() are used to enable a successful connection between the server and client. Messages are sent back and forth between the two nodes using send() and recv(). 
 
 int sock1, sock2, valread;
@@ -197,121 +197,10 @@ int addrlen = sizeof(address); // Getting the size off the address
      }
 
 
-Client Disconnection and Reconnection
+### Client Disconnection and Reconnection
 The server waits for the client to connect and accepts commands as long as it is connected to the. When the client leaves using ‘exit’, the connection is disrupted and the server now goes back to waiting for a client to connect. This functions similar to how an actual server and client system would work. This feature is implemented by using a flag which checks which changes to true if the client sends exit. This makes the client exit and sends the server to waiting for a client. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-VI. 	Test Cases:
-Here are our commands with screenshots of both our server and client end.
-ls:
-
-
-touch:
-
-
-
-
-
-
-mkdir:
-
-
-pwd:
-
-rm:
-
-
-
-
-
-
-
-
-
-cp : 
-
-
-
-
-rmdir :The folder can was deleted and can not be seen on the highlighted box area. (Previously present in the image for cp)
-
-wc:
-
-
-
-find:
-
-
-
-
-
-
-
-
-
-
-
-
-
-mv :
-
-As it can be seen the sample folder was moved inside the Dest directory
-
- cat :
-
-
-ps: :
-
-df :
-
-
-
-
-who am i:
-
-
-Single pipe execution:
-
-
-Double pipes execution:
-
-
-
-
-Triple pipes execution:
-
-
-
-Error Handling Test Cases:
-When creating same file name error message is relayed back to client
-
-
-Null argument in a piped commands
-
-
-Piped command without all arguments
-
-
-
-Enter without any command doesn't break code :) 
-
-
-
-
-VII. 	Challenges :-
+### Challenges :-
 
 We ran into a lot of bugs for this Phase. Most were due to the complex working of the c programming language. A few of them are detailed below. 
 
@@ -325,34 +214,9 @@ We faced a bug where the client kept quitting after entering piped commands. Upo
 
 
 
+## PHASE 3:-
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-PHASE 3:-
-
-File Contents:
+### File Contents:
 
 client.c : Contains the main function for running the client side application.
 server.c : Contains the main function for running the server side application.
@@ -361,7 +225,7 @@ pipes.c : Performs execution of commands with pipes. There are separate function
 pipesplitter.c : performs parsing and tokenizing of all entered commands. Also performs the task of splitting pipes commands into separate commands.
 print.c : Prints the user prompt and current directory during each execution. singlecommand.c : Runs execution of the commands which do not use pipes.
 
-How to Compile and Run:
+### How to Compile and Run:
 
 We have used makefile to organize the project’s code compilation. To run a makefile code, run the following commands in the terminal. 
 
@@ -374,20 +238,9 @@ Finally start clients using $./client
 
 
 
+### Functions and Functionalities:
 
-
-
-
-
-
-
-
-
-
-
-Functions and Functionalities:
-
-Multithreading for multiple Clients
+#### Multithreading for multiple Clients
  
  while (1) // to keep server alive forever
  {
@@ -425,7 +278,7 @@ Multithreading for multiple Clients
 
 
 
-2. Exiting Client using “exit” and ^C:
+#### Exiting Client using “exit” and ^C:
 
 void clientExitHandler(int sig_num)
 {
@@ -447,7 +300,7 @@ int main() // main function
 
 
 
-V. 	Challenges :-
+### Challenges :-
 The challenges faced in this phase were easier to analyze and debug.  
 
 The first error we came across after merging our Phase 2 code with a multi-client code was while exiting our client. It was causing the server to spam a null character. We fixed this by closing the sockets in the right places and in the right order. The incorrect termination of the threads might have also contributed to the error which we handled correctly. 
@@ -458,7 +311,7 @@ The exiting of the client using two different methods, ^c and “exit” gave us
 
 #PHASE 4:-
 
-#File Contents:
+### File Contents:
 
 client.c : Contains the main function for running the client side application.
 server.c : Contains the main function for running the server side application.
@@ -479,7 +332,7 @@ Finally start clients using $./client
 
 
 
-##Functions and Functionalities:
+### Functions and Functionalities:
 
 Struct for each Process
 //Structure to hold each process detail
@@ -503,7 +356,7 @@ struct process
 struct process queue[MAX_QUEUE_SIZE];
 
 
-Shortest Job First
+### Shortest Job First
 void sortQueue()
 {
  int index, i, j;
@@ -530,7 +383,7 @@ void sortQueue()
  }
 
 
-##Priority in the Queue
+### Priority in the Queue
 // Sorting the queue by priority (by default it is 0 for all process)
 void sortQueueByPriority()
 {
@@ -550,7 +403,7 @@ void sortQueueByPriority()
 }
 
 
-###Adding to the queue 
+### Adding to the queue 
 
 This function basically adds each command to the queue by taking in the common and socket as arguments and create a new structure for that process to be added to the queue. By default it has a priority of zero and the name and first time specified by the user which is parsed accordingly and assigned to the respective variables in the structure. Here is a commented code to see our implementation for this function.
 
@@ -601,7 +454,7 @@ struct process addToQueue(char *command, int socket) // Command from client and 
 
 
 
-##Scheduler 
+### Scheduler 
 The schedule function runs in a wild look because the schedule will always be running on its own core thread. Function will call our scheduling algorithm which is round robin.
 // Scheduler which is running on a separate thread is always running RR
 void *Scheduler(void *arg)
@@ -628,7 +481,7 @@ void *Scheduler(void *arg)
 
 
 
-Real time clock for Arrival time.
+### Real time clock for Arrival time.
 This functions allowed us to implement a real time stopwatch for arrival time which was used for each process as soon as it was received by the server and add it to the queue. We used a signal which with our alarm for one second and incremented a global seconds variable.
 void handle(int sig)
 { // Handles the signal alarm
@@ -643,7 +496,7 @@ void handle(int sig)
    alarm(1);
 
 
-Program Runing Simulation 
+### Program Runing Simulation 
 Program runner function allowed us to simulate a program which would run in the OS. For this the user specifies the time and priority if needed which is updated in the structure. The running structure is paused into the function along with the quantum which is used in the follow-up to run for that specified quantum seconds which is simulated by using sleep for one second and decrementing the process time.
 
 Program runner also takes care of the case where the process is not finished it updates the time it has run for quantum and puts it back in the queue at the bottom thus preparing for a round robin to take place.
@@ -680,7 +533,7 @@ void programRunner(struct process *process, int quantum) // Process passes as po
 
 Similarly, we used command runner to implement the the command case where do use the word specify a Linux terminal command and that function was built upon all the code from our previous phases.
 
-Exiting Client using “exit” and ^C:
+### Exiting Client using “exit” and ^C:
 
 void clientExitHandler(int sig_num)
 {
@@ -701,7 +554,7 @@ int main() // main function
 }
 
 
-##Algorithms Used
+## Algorithms Used
 
 The hybrid algorithm we used for this assignment was a combination of shortest job first and round robin algorithm. The round robin is based on a changing time quantum depending on the rounds you have run and we also implemented priority which the user can specify and the process will be given higher priority to run first in the queue when it gets assigned. 
 
@@ -729,7 +582,7 @@ Lastly we update the time elapsed variable by adding the respective time that he
 
 
 
-###RR Code
+## #RR Code
 void RR()
 {
  int time_elapsed = 0; // if time has passed to update completed time later
@@ -812,7 +665,7 @@ void RR()
 
 
 
-###Challenges:
+### Challenges:
 The challenges faced in this phase were easier to analyze and debug.  
 
 The biggest challenge he faced in this phase was with the use of semaphores and how most of the functions for it wouldn't work on macOS and many of its functions have been deprecated. 
